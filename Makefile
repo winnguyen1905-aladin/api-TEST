@@ -175,6 +175,55 @@ clean-all: ## Clean everything (code + Docker)
 reset: clean-all setup ## Reset and setup from scratch
 
 # ================================
+# Production Deployment
+# ================================
+
+.PHONY: deploy
+deploy: ## Deploy to production (run on server)
+	@echo "🚀 Deploying to production..."
+	@chmod +x scripts/deploy.sh
+	@./scripts/deploy.sh
+
+.PHONY: deploy-check
+deploy-check: ## Check if ready for deployment
+	@echo "🔍 Checking deployment readiness..."
+	@echo "✓ Running tests..."
+	@npm test || exit 1
+	@echo "✓ Building..."
+	@npm run build || exit 1
+	@echo "✓ All checks passed!"
+	@echo ""
+	@echo "Ready to deploy!"
+
+.PHONY: pm2-start
+pm2-start: ## Start with PM2 (production)
+	pm2 start ecosystem.config.js --env production
+
+.PHONY: pm2-stop
+pm2-stop: ## Stop PM2 app
+	pm2 stop aladin-backend
+
+.PHONY: pm2-restart
+pm2-restart: ## Restart PM2 app
+	pm2 restart aladin-backend
+
+.PHONY: pm2-reload
+pm2-reload: ## Reload PM2 app (zero-downtime)
+	pm2 reload aladin-backend
+
+.PHONY: pm2-logs
+pm2-logs: ## View PM2 logs
+	pm2 logs aladin-backend
+
+.PHONY: pm2-monit
+pm2-monit: ## Monitor PM2 app
+	pm2 monit
+
+.PHONY: pm2-status
+pm2-status: ## Show PM2 status
+	pm2 status
+
+# ================================
 # Default target
 # ================================
 

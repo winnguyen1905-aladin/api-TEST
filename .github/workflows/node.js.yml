@@ -10,7 +10,8 @@ on:
     branches: [ "main", "develop" ]
 
 jobs:
-  build:
+  # Job 1: Test
+  test:
     name: Build and Test
     runs-on: self-hosted
 
@@ -70,4 +71,98 @@ jobs:
       if: always()
       run: |
         docker-compose -f docker-compose.dev.yml down
+  
+  # Job 2: Deploy to Production (only on main branch push)
+  deploy:
+    name: Deploy to Production
+    runs-on: self-hosted
+    needs: test
+    if: |
+      github.event_name == 'push' && 
+      github.ref == 'refs/heads/main' &&
+      needs.test.result == 'success'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '22.x'
+    
+    - name: Install production dependencies
+      run: npm ci --only=production
+    
+    - name: Build TypeScript
+      run: npm run build
+    
+    - name: Start/Restart Redis (Production)
+      run: |
+        # Check if Redis container exists
+        if docker ps -a | grep -q "aladin-redis-prod"; then
+          echo "Starting existing Redis container..."
+          docker start aladin-redis-prod || true
+        else
+          echo "Creating new Redis container..."
+          docker run -d \
+            --name aladin-redis-prod \
+            -p 6379:6379 \
+            -v redis-prod-data:/data \
+            --restart unless-stopped \
+            redis:7-alpine \
+            redis-server --appendonly yes --appendfsync everysec
+        fi
+        
+        # Health check
+        sleep 3
+        docker exec aladin-redis-prod redis-cli ping
+    
+    - name: Install PM2 (if not installed)
+      run: |
+        if ! command -v pm2 &> /dev/null; then
+          echo "Installing PM2..."
+          npm install -g pm2
+        else
+          echo "PM2 already installed"
+        fi
+    
+    - name: Deploy Application
+      run: |
+        # Stop old process (if exists)
+        pm2 delete aladin-backend || true
+        
+        # Start new process
+        pm2 start dist/server.js \
+          --name aladin-backend \
+          --instances max \
+          --env production
+        
+        # Save PM2 process list
+        pm2 save
+        
+        # Setup startup script (first time)
+        pm2 startup systemd -u $(whoami) --hp $HOME || true
+    
+    - name: Show deployment status
+      run: |
+        echo "=== Deployment Status ==="
+        pm2 status
+        echo ""
+        echo "=== Application Info ==="
+        pm2 info aladin-backend
+    
+    - name: Health check
+      run: |
+        echo "Waiting for app to start..."
+        sleep 5
+        
+        # Simple health check
+        if pm2 list | grep -q "aladin-backend.*online"; then
+          echo "✅ Application is running!"
+        else
+          echo "❌ Application failed to start!"
+          pm2 logs aladin-backend --lines 50 --nostream
+          exit 1
+        fi
 
