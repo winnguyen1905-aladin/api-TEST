@@ -1,0 +1,1 @@
+export { WorkerManager } from "./service/worker.service";

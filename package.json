@@ -1,0 +1,38 @@
+{
+  "dependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
+    "bullmq": "^5.61.0",
+    "express": "^4.21.1",
+    "inversify": "^7.10.1",
+    "ioredis": "^5.8.1",
+    "jsonwebtoken": "^9.0.2",
+    "mediasoup": "^3.14.16",
+    "redis": "^4.7.0",
+    "reflect-metadata": "^0.2.2",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.16",
+    "eslint-plugin-editorconfig": "^4.0.3",
+    "nodemon": "^3.1.10",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.3.3"
+  },
+  "scripts": {
+    "start": "node dist/server.js",
+    "start:ts": "npm run build && node dist/server.js",
+    "dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "dev:ts": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
+    "dev:mixed": "nodemon",
+    "clean": "rimraf dist",
+    "build": "npm run clean && tsc",
+    "build:watch": "tsc --watch",
+    "build:prod": "npm run clean && tsc --project tsconfig.json",
+    "preview": "vite preview"
+  }
+}

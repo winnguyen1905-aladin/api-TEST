@@ -1,0 +1,9 @@
+# Mark auto-generated files
+prisma/schema.prisma linguist-generated=true
+prisma/schema.prisma.backup linguist-generated=true
+
+# Line ending normalization
+* text=auto eol=lf
+*.{cmd,[cC][mM][dD]} text eol=crlf
+*.{bat,[bB][aA][tT]} text eol=crlf
+

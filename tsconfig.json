@@ -1,0 +1,73 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "lib": [
+      "ES2020"
+    ],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "removeComments": false,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "exactOptionalPropertyTypes": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@/config/*": [
+        "src/config/*"
+      ],
+      "@/classes/*": [
+        "src/classes/*"
+      ],
+      "@/utilities/*": [
+        "src/utilities/*"
+      ],
+      "@/types/*": [
+        "src/types/*"
+      ],
+      "@/common/*": [
+        "src/common/*"
+      ],
+      "@/utils/*": [
+        "src/utils/*"
+      ],
+      "@/socket/*": [
+        "src/modules/socket/*"
+      ],
+      "@modules/*": [
+        "src/modules/*"
+      ],
+      "@modules": [
+        "src/modules"
+      ]
+    }
+  },
+  "include": [
+    "src/**/*",
+    "garbage-js/config.js"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

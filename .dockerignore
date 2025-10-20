@@ -1,0 +1,53 @@
+# Node modules
+node_modules
+npm-debug.log
+
+# TypeScript
+*.tsbuildinfo
+
+# Build output
+dist
+
+# Environment
+.env
+.env.*
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs
+*.log
+
+# Test
+coverage
+.nyc_output
+
+# Documentation
+*.md
+!README.md
+
+# Docker
+Dockerfile
+docker-compose*.yml
+.dockerignore
+
+# Misc
+.editorconfig
+.eslintrc.js
+.prettierrc
+tsconfig.json
+

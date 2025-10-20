@@ -1,0 +1,10 @@
+{
+  "maxActiveSpeakers": 10,
+  "maxRoomMembers": 50,
+  "description": "Room configuration settings",
+  "notes": {
+    "maxActiveSpeakers": "Maximum number of active speakers to show in video grid (default: 10)",
+    "maxRoomMembers": "Maximum number of members allowed in a room (default: 50)",
+    "performance": "Higher values may impact performance. Recommended: 5-20 for activeSpeakers, 10-100 for roomMembers"
+  }
+}
