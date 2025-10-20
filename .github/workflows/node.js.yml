@@ -43,6 +43,16 @@ jobs:
         python3 --version || python --version
         gcc --version || echo "GCC not found"
     
+    # Start Redis for development/testing
+    - name: Start Redis
+      run: |
+        docker-compose -f docker-compose.dev.yml up -d redis
+        docker-compose -f docker-compose.dev.yml ps
+        
+        # Wait for Redis to be ready
+        sleep 5
+        docker exec aladin-redis-dev redis-cli ping
+    
     - name: Install dependencies
       run: npm ci
     
@@ -54,4 +64,10 @@ jobs:
     
     - name: Check dist folder
       run: ls -la dist
+    
+    # Cleanup - Stop Redis after build
+    - name: Stop Redis
+      if: always()
+      run: |
+        docker-compose -f docker-compose.dev.yml down
 
