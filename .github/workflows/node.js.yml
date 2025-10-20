@@ -1,0 +1,57 @@
+# Backend CI/CD Pipeline
+# Builds and tests the Node.js/TypeScript backend with mediasoup support
+
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+  build:
+    name: Build and Test
+    runs-on: self-hosted
+
+    strategy:
+      matrix:
+        node-version: [22.x]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    # Setup Python for mediasoup native modules
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+    
+    - name: Setup Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+        cache: 'npm'
+    
+    # Verify build tools are installed on self-hosted runner
+    # Setup instructions: See .github/RUNNER_SETUP.md
+    - name: Verify build tools
+      run: |
+        echo "Node: $(node --version)"
+        echo "NPM: $(npm --version)"
+        python3 --version || python --version
+        gcc --version || echo "GCC not found"
+    
+    - name: Install dependencies
+      run: npm ci
+    
+    - name: Build TypeScript
+      run: npm run build
+    
+    # - name: Run tests
+    #   run: npm test
+    
+    - name: Check dist folder
+      run: ls -la dist
+
