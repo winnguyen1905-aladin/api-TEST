@@ -62,7 +62,7 @@ jobs:
     
     # - name: Run tests
     #   run: npm test
-    
+  
     - name: Check dist folder
       run: ls -la dist
     
