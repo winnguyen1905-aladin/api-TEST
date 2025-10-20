@@ -1,21 +1,17 @@
 # Node modules
 node_modules
 npm-debug.log
-
-# TypeScript
-*.tsbuildinfo
+yarn-error.log
 
 # Build output
 dist
 
-# Environment
-.env
-.env.*
-
-# Git
+# Development files
+*.md
 .git
 .gitignore
-.gitattributes
+.env
+.env.*
 
 # IDE
 .vscode
@@ -24,30 +20,20 @@ dist
 *.swo
 *~
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
 
-# Logs
-logs
-*.log
-
-# Test
+# Test files
+*.test.ts
+*.spec.ts
+__tests__
 coverage
-.nyc_output
+
+# Docker files
+Dockerfile
+.dockerignore
+docker-compose.yml
 
 # Documentation
-*.md
-!README.md
-
-# Docker
-Dockerfile
-docker-compose*.yml
-.dockerignore
-
-# Misc
-.editorconfig
-.eslintrc.js
-.prettierrc
-tsconfig.json
-
+docs
