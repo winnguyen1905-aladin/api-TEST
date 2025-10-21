@@ -44,15 +44,19 @@ jobs:
         python3 --version || python --version
         gcc --version || echo "GCC not found"
     
-    # Start Redis for development/testing
-    - name: Start Redis
+    # Start Redis for testing
+    - name: Start Redis with Docker Compose
       run: |
+        # Stop any existing containers first
+        docker-compose -f docker-compose.yml down --remove-orphans || true
+        
+        # Start Redis
         docker-compose -f docker-compose.yml up -d redis
         docker-compose -f docker-compose.yml ps
         
         # Wait for Redis to be ready
         sleep 5
-        docker exec aladin-redis-prod redis-cli ping
+        docker-compose -f docker-compose.yml exec -T redis redis-cli ping
     
     - name: Install dependencies
       run: npm ci
@@ -70,7 +74,7 @@ jobs:
     - name: Stop Redis
       if: always()
       run: |
-        docker-compose -f docker-compose.yml down
+        docker-compose -f docker-compose.yml down --remove-orphans
   
   # Job 2: Deploy to Production (only on main branch push)
   deploy:
@@ -97,27 +101,28 @@ jobs:
     - name: Build TypeScript
       run: npm run build
     
-    - name: Start/Restart Redis (Production)
+    - name: Ensure Redis is Running (Production)
       run: |
-        # Check if Redis container exists
-        if docker ps -a | grep -q "aladin-redis-prod"; then
-          echo "Starting existing Redis container..."
-          docker start aladin-redis-prod || true
+        # Check if Redis is already running
+        if docker-compose -f docker-compose.yml ps redis | grep -q "Up"; then
+          echo "✅ Redis is already running"
         else
-          echo "Creating new Redis container..."
-          docker run -d \
-            --name aladin-redis-prod \
-            -p 6379:6379 \
-            -v redis-prod-data:/data \
-            --restart unless-stopped \
-            redis:7-alpine \
-            redis-server --appendonly yes --appendfsync everysec
+          echo "Starting Redis with Docker Compose..."
+          # Start Redis in detached mode (keeps data from previous runs)
+          docker-compose -f docker-compose.yml up -d redis
+          
+          # Wait for Redis to be ready
+          echo "Waiting for Redis to be ready..."
+          sleep 5
         fi
         
-        
         # Health check
-        sleep 3
-        docker exec aladin-redis-prod redis-cli ping
+        docker-compose -f docker-compose.yml exec -T redis redis-cli ping
+        
+        # Show running containers
+        echo ""
+        echo "=== Docker Compose Status ==="
+        docker-compose -f docker-compose.yml ps
     
     - name: Install PM2 (if not installed)
       run: |

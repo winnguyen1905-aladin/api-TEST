@@ -1,8 +1,9 @@
 version: '3.8'
 
 # ================================
-# Development Environment
-# Simpler setup for local development
+# Backend Services Configuration
+# Used for: Local development, CI/CD testing, and production deployment
+# Note: Volume 'redis-dev-data' persists data across restarts
 # ================================
 
 services:
