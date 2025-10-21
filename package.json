@@ -20,6 +20,7 @@
     "rimraf": "^5.0.5",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.8",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.3.3"
   },
@@ -30,9 +31,9 @@
     "dev:ts": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/server.ts",
     "dev:mixed": "nodemon",
     "clean": "rimraf dist",
-    "build": "npm run clean && tsc",
+    "build": "npm run clean && tsc && tsc-alias",
     "build:watch": "tsc --watch",
-    "build:prod": "npm run clean && tsc --project tsconfig.json",
+    "build:prod": "npm run clean && tsc --project tsconfig.json && tsc-alias",
     "preview": "vite preview"
   }
 }

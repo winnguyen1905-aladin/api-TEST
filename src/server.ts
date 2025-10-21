@@ -25,12 +25,9 @@ async function bootstrap() {
   // 2) Socket.IO
   const io = new SocketIOServer(httpServer, {
     cors: {
-      origin: [
-        'https://localhost:5173',
-        'http://localhost:5173',
-        'https://192.168.1.44',
-      ],
+      origin: '*', // Allow all origins for development
       methods: ['GET', 'POST'],
+      credentials: true,
     },
   });
 
