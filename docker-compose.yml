@@ -9,7 +9,7 @@ services:
   # Redis only (minimal setup)
   redis:
     image: redis:7-alpine
-    container_name: chat-redis-dev
+    container_name: aladin-redis-prod
     command: redis-server --appendonly yes --appendfsync everysec
     ports:
       - "6379:6379"
@@ -22,12 +22,12 @@ services:
       timeout: 3s
       retries: 3
     networks:
-      - chat-dev
+      - aladin-network
 
   # Redis Commander (Web UI)
   redis-commander:
     image: rediscommander/redis-commander:latest
-    container_name: redis-commander-dev
+    container_name: aladin-redis-commander-prod
     environment:
       - REDIS_HOSTS=local:redis:6379
     ports:
@@ -35,7 +35,7 @@ services:
     depends_on:
       - redis
     networks:
-      - chat-dev
+      - aladin-network
 
   # PostgreSQL (optional)
   # postgres:
@@ -59,7 +59,7 @@ services:
   #     - chat-dev
 
 networks:
-  chat-dev:
+  aladin-network:
     driver: bridge
 
 volumes:
