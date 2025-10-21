@@ -47,20 +47,29 @@ jobs:
     # Start Redis for testing
     - name: Start Redis with Docker Compose
       run: |
-        # Stop any existing docker-compose containers
-        docker-compose -f docker-compose.yml down --remove-orphans || true
+        # Check if container exists
+        if docker ps -a --format '{{.Names}}' | grep -q '^aladin-redis-prod$'; then
+          echo "Container aladin-redis-prod already exists"
+          
+          # Check if it's running
+          if docker ps --format '{{.Names}}' | grep -q '^aladin-redis-prod$'; then
+            echo "✅ Redis is already running, reusing existing container"
+          else
+            echo "Starting stopped Redis container..."
+            docker start aladin-redis-prod
+            sleep 3
+          fi
+        else
+          echo "Creating new Redis container with docker-compose..."
+          docker-compose -f docker-compose.yml up -d redis
+          sleep 5
+        fi
         
-        # Remove any manually created containers with the same name
-        docker rm -f aladin-redis-prod 2>/dev/null || true
-        docker rm -f aladin-redis-commander-prod 2>/dev/null || true
+        # Health check
+        docker exec aladin-redis-prod redis-cli ping
         
-        # Start Redis
-        docker-compose -f docker-compose.yml up -d redis
-        docker-compose -f docker-compose.yml ps
-        
-        # Wait for Redis to be ready
-        sleep 5
-        docker-compose -f docker-compose.yml exec -T redis redis-cli ping
+        # Show status
+        docker ps --filter name=aladin-redis-prod
     
     - name: Install dependencies
       run: npm ci
@@ -74,11 +83,7 @@ jobs:
     - name: Check dist folder
       run: ls -la dist
     
-    # Cleanup - Stop Redis after build
-    - name: Stop Redis
-      if: always()
-      run: |
-        docker-compose -f docker-compose.yml down --remove-orphans
+    # Note: Redis container is kept running for next CI runs (faster startup)
   
   # Job 2: Deploy to Production (only on main branch push)
   deploy:
@@ -107,31 +112,32 @@ jobs:
     
     - name: Ensure Redis is Running (Production)
       run: |
-        # Check if Redis is already running via docker-compose
-        if docker-compose -f docker-compose.yml ps redis | grep -q "Up"; then
-          echo "✅ Redis is already running via docker-compose"
+        # Check if container exists
+        if docker ps -a --format '{{.Names}}' | grep -q '^aladin-redis-prod$'; then
+          echo "Container aladin-redis-prod already exists"
+          
+          # Check if it's running
+          if docker ps --format '{{.Names}}' | grep -q '^aladin-redis-prod$'; then
+            echo "✅ Redis is already running, reusing existing container"
+          else
+            echo "Starting stopped Redis container..."
+            docker start aladin-redis-prod
+            sleep 3
+          fi
         else
-          echo "Setting up Redis with Docker Compose..."
-          
-          # Remove any manually created containers with the same name (migration cleanup)
-          docker rm -f aladin-redis-prod 2>/dev/null || true
-          docker rm -f aladin-redis-commander-prod 2>/dev/null || true
-          
-          # Start Redis in detached mode (keeps data from previous runs)
+          echo "Creating new Redis container with docker-compose..."
           docker-compose -f docker-compose.yml up -d redis
-          
-          # Wait for Redis to be ready
-          echo "Waiting for Redis to be ready..."
           sleep 5
         fi
         
         # Health check
-        docker-compose -f docker-compose.yml exec -T redis redis-cli ping
+        docker exec aladin-redis-prod redis-cli ping
         
         # Show running containers
         echo ""
-        echo "=== Docker Compose Status ==="
-        docker-compose -f docker-compose.yml ps
+        echo "=== Redis Status ==="
+        docker ps --filter name=aladin-redis-prod
+        docker inspect aladin-redis-prod --format='Status: {{.State.Status}} | Uptime: {{.State.StartedAt}}'
     
     - name: Install PM2 (if not installed)
       run: |
