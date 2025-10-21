@@ -47,8 +47,12 @@ jobs:
     # Start Redis for testing
     - name: Start Redis with Docker Compose
       run: |
-        # Stop any existing containers first
+        # Stop any existing docker-compose containers
         docker-compose -f docker-compose.yml down --remove-orphans || true
+        
+        # Remove any manually created containers with the same name
+        docker rm -f aladin-redis-prod 2>/dev/null || true
+        docker rm -f aladin-redis-commander-prod 2>/dev/null || true
         
         # Start Redis
         docker-compose -f docker-compose.yml up -d redis
@@ -103,11 +107,16 @@ jobs:
     
     - name: Ensure Redis is Running (Production)
       run: |
-        # Check if Redis is already running
+        # Check if Redis is already running via docker-compose
         if docker-compose -f docker-compose.yml ps redis | grep -q "Up"; then
-          echo "✅ Redis is already running"
+          echo "✅ Redis is already running via docker-compose"
         else
-          echo "Starting Redis with Docker Compose..."
+          echo "Setting up Redis with Docker Compose..."
+          
+          # Remove any manually created containers with the same name (migration cleanup)
+          docker rm -f aladin-redis-prod 2>/dev/null || true
+          docker rm -f aladin-redis-commander-prod 2>/dev/null || true
+          
           # Start Redis in detached mode (keeps data from previous runs)
           docker-compose -f docker-compose.yml up -d redis
           
