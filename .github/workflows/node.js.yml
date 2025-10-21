@@ -47,12 +47,12 @@ jobs:
     # Start Redis for development/testing
     - name: Start Redis
       run: |
-        docker-compose -f docker-compose.dev.yml up -d redis
-        docker-compose -f docker-compose.dev.yml ps
+        docker-compose -f docker-compose.yml up -d redis
+        docker-compose -f docker-compose.yml ps
         
         # Wait for Redis to be ready
         sleep 5
-        docker exec aladin-redis-dev redis-cli ping
+        docker exec aladin-redis-prod redis-cli ping
     
     - name: Install dependencies
       run: npm ci
@@ -70,7 +70,7 @@ jobs:
     - name: Stop Redis
       if: always()
       run: |
-        docker-compose -f docker-compose.dev.yml down
+        docker-compose -f docker-compose.yml down
   
   # Job 2: Deploy to Production (only on main branch push)
   deploy:
