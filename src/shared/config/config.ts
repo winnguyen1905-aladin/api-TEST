@@ -94,8 +94,9 @@ const config: Config = {
   webRtcTransport: {
     listenIps: [
       {
-        ip: "0.0.0.0", // Listen on all interfaces
-        announcedIp: "14.225.192.43", // Your public IP address
+        ip: "127.0.0.1", // anywhere
+        // announcedIp: null, // replace by public IP address
+        announcedIp: '14.225.192.43',
       },
     ],
     // For a typical video stream with HD quality, you might set maxIncomingBitrate

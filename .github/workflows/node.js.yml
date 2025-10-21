@@ -87,7 +87,7 @@ jobs:
   
   # Job 2: Deploy to Production (only on main branch push)
   deploy:
-    name: Deploy to Production
+    name: Deploy to Production  
     runs-on: self-hosted
     needs: test
     if: |
